@@ -28,3 +28,11 @@ This repo is a documentation of the Advanced Physical Design using OpenLANE/Sky1
 - Routing and design rule check (DRC)
 - Power distribution network and routing
 - TritonRoute features
+
+
+# Day-1
+
+## How to talk to computers
+### Introduction to QFN-48 Package, chip, pads, core, die and IPs
+
+Take an arduino board, the entire board can be described in terms of a block diagram, with Processor, SD RAM chip, VCC, etc blocks associated with it. Inside the chip, there will be multiple pins available. This chip that is generally referred to should be called as a package with multiple pins.
