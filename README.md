@@ -35,7 +35,8 @@ This repo is a documentation of the Advanced Physical Design using OpenLANE/Sky1
 ## How to talk to computers
 ### Introduction to QFN-48 Package, chip, pads, core, die and IPs
 
-Take an arduino board, the entire board can be described in terms of a block diagram, with Processor, SD RAM chip, VCC, etc blocks associated with it. Inside the chip, there will be multiple pins available. This chip that is generally referred to should be called as a package with multiple pins. The particular package in the course is QFN-48 ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/129c50d3-def5-4b87-85ef-d24d68ddee2f)
+Take an arduino board, the entire board can be described in terms of a block diagram, with Processor, SD RAM chip, VCC, etc blocks associated with it. Inside the chip, there will be multiple pins available. This chip that is generally referred to should be called as a package with multiple pins. The particular package in the course is QFN-48 
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/129c50d3-def5-4b87-85ef-d24d68ddee2f)
 
 - The chip is generally placed at the centre of the package and wire bonds are usually used to connect them to the package pins
 - The chip will have various components:
