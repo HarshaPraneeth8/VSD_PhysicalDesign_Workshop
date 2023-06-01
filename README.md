@@ -288,4 +288,4 @@ yosys_4.stat.rpt
 
 
 # Day-2
-
+## Floorplanning and introduction to library cells
