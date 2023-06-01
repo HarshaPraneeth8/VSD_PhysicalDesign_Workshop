@@ -274,7 +274,7 @@ To find the **FLOP RATIO** i.e, number of D-Flip Flops:
 ```
 Number of cells: 14876
 Number of D FF: 1613
-Flop count: 0.10842968
+Flop count (Number of D-FF/ Number of cells) : 0.10842968
 Flop count percentage: 10.8429
 ```
 To check the reports:
@@ -289,3 +289,110 @@ yosys_4.stat.rpt
 
 # Day-2
 ## Floorplanning and introduction to library cells
+### Utilization factor and aspect ratio
+
+In the physical design flow, the first step is to define the height and width of the core and the die
+- We start with a netlist, say 2 ff and a combinational logic in between(for example)
+- A netlsit basically describes the connectivity between all the components
+- we are mostly interested in  the dimensions of the standard cells, wires are not considered as of now
+- say standard cells are given a dimension on 1x1 unit, assume the same area for the ff as well
+- With the help of these dimensions, area on the silicon can be identified
+- Total length and width would be 2 x 2 = 4 sq units(area), this is the minimum area that would be occupied
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/b7135f6e-70c5-412e-9c15-2f9ea77ee5f3)
+
+- On the silicon wafer, one section is referred to as the die and inside the die, we have the core
+- The die encapsulates the core, a die is a small semiconductor material specimen on which the fundamental circuit is fabricated.
+- If the netlist occupies the entire coore --> 100% utilization, 
+```
+Utilization factor = Area occupied by the netlist/Total area of the core
+```
+- When utilization factor is one, the core is completely occupied, ideally we go for 50-60% utilization
+
+```
+aspect ratio = height/width
+```
+- When aspect ratio is 1, it signifies that the core is of a square shape
+
+### Concept of pre placed cells
+
+- Take a combinational logic, we needn't implement the logic everytime completely, the circuit can be divided into smaller bits
+- The individual blocks are later connected via wires
+- The IO pins are extended and the boxes are detached, this creates 2 different modules or IPs
+- The advantage of doing this is that if a particular block is being replicated multiple times, this black-boxed blocks can be implemented and then connected
+- Implementing it once is enough, multiple implementations are not needed
+- There are IPs available in the market such as, Memory, clock-gating cell, comparators, etc.
+- The arrangement of these IPs in a chip is called **Floorplanning**
+- Automated placement and routning tools places the remaining logical cells in the design onto chip
+
+### De-coupling capacitors
+
+Consider we have the pre placed cells: block a,b and c which are memories
+- These are only implemented once and used multiple times
+- The locations of these pre placed cells cannot be moved once placed.
+- Preplaced cells should be surrounded with decoupling capacitors
+
+When a particular circuit switches, it needs a current demand, basically at the switching logic, we can say that there is an amount of capacitance there , and when closed, it needs an amount of charge, which it demands from the supply voltage. The supply logic should be adequate to supply enough current to all the gates. Similarly, it is the responsibilty of the Vss to take the charge when the gates switch from logic 1 to 0.
+
+- In reality, there is a drop in the wire due to resistances, inductances, etc..
+- If the voltage drop is too huge, proper logic 1 and logic 0 cannot be defined and will lead to errors
+- This is the problem of having a large physical distance
+- this problem can be solved by using decoupling capacitos: they are large capacitors, completely filled with charge
+- The capacitor essentially de couples the circuit from the power supply
+- Whenever there is switching activity, the capacitor slowly depletes its charge and when no switching takes place, then the capacitor replenishes itself.
+- The preplaced cells are placed with Decaps to ensure no problems occur
+- Local communication(inside the preplaced cells) is taken care of but global planning is to be taken care of next.
+
+### Power planning
+
+When connecting from one preplace cell to the other, the power  supply needs to connect and drive the signal as using decoupling capacitors always is not possible. A voltage drop will most likely happen.
+- Ground bounce is a phenomenon when all the capacitances discharge at the same time, if this bump exceeds the noise margin level, it can lead to an undefined logic value.
+- When all the capacitances want to charge, they demand current at the same time and therefore there is a voltage droop, it should also not exceed the Noise margin level
+- The problem in the example is that the power supply is only at one position and from a single source
+- distributing this power source and having multiple power supplies may solve the above mentioned problems
+- So, multiple Vdd and Vss lines are placed inside the core.
+
+### Pin placement and logical cell placement blockage
+- Take the following example
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/2ff75627-e980-4ffb-a35b-3c0fc869847d)
+The grey boxes are pre placed cells that are defined before
+and
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/39610fae-decd-42ee-957d-e52a944abc20)
+
+- Now looking into the complete deisgn, the 2 sections are merged together, we have 2 clocks, clk1 and clk2
+- All this connectivity is defined in HDL
+- This is basically a netlist, connectivity information among different circuits
+- Usually, all the i/p ports are kept on the LHS, and o/p ports are kept on the RHS
+- The ordering of the input and output words are random, this depends upon where we want to place the cells
+- The clock ports are larger than the other ports, because the clock ports drive the circuit continously, so we need low resistance, so the larger IO areas.
+- Next, a logical cell placement blockage is performed, so that the automatic tool doesn't put items on the IO area.
+
+### Steps to run floorplan using openLANE
+
+After synthesis, we have floorplanning
+The standard cell placements happen in placemenet stage, it does not happen in floorplanning
+- To view the configuration variables and their default values
+```
+~/Desktop/work/tools/openlane_working_dir/openlane/configuration
+less README.md
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/9a986825-4d93-4325-bcd5-a648c50e6396)
+after scrolling down, in floorplanning, there are multiple switches that can be seen and the utilization, aspect ratio, etc can be seen(Defaults)
+- the design is preferrably initial spread, because when we do the PnR flow, congestion analysis is carried out first, post that we want the timing constraints to be met.
+- These switches are set in .tcl files
+- for example, for the floor plan stage
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/71652f4e-865c-4b43-bd69-dad948783ec5)
+
+- pin mode 1: random poition, but equidistant
+- pin mode 0: not equidistant
+- The highest priority for these defaults will be **sky130A_sky130_fd_sc_hd_config.tcl**, and then config.tcl, and then the tcl file inside the folder as shown above
+- In openlane flow, verical metal and horizontal metal values are 1 more than the normal ones
+
+The command to run floorplan is
+```
+run floorplan
+```
+- the warnings neednt be taken seriously
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/309a2b45-b1de-4623-9d1c-c931001000e9)
+
+### Review floorplan files and steps to view floorplan
+
