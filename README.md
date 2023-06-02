@@ -446,4 +446,96 @@ Say, we have a particular netlist with some gates, the shape of these gates will
 - The cells are placed near to its IO pins so that delays are avoided
 
 ### Optimize placement using estimated wire length and capacitance
+an example placement is as shown below:
 
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/9fba1d70-52c6-4a06-95d4-8a8338f8181c)
+
+- For the last ff, it becomes difficult due to restrictions
+- The problems discussed such as only some blocks being closer to their ports, can be addresssed, this is called optimizing placement
+- We take some estimations, say ff1 to din2, we try to estimate the capacitances in the wires that would be connected before actually routing
+- Basically optimize placement is the step when the wire length, and capacitances are estimated, and based on that repeaters are inserted.
+- This is done mainly to maintain signal integrity. Repeaters are buffers that will recondition the original signal
+- But due to these repeaters, we will have a loss of area
+- slew is based on the value of the capacitor, the higher the capacitance, the higher is the amount of charge required to charge the capacitor,and slew will be bad.
+- Based on this, we estimate the signal integrity and if distances are reasonable enough --> this is done for each box
+
+### Final placement optimization
+
+- after the placement optimization, we need to do a timing analysis.
+- The buffers are placed accordingly wherever required to maintain signal integrity
+- Based on the setup timing analysis, the placement done is verified and checked.
+
+
+### Need for libraries and characterization
+
+- Logical synthesis: output is an arrangement of gates that describe the original circuit.
+- Floorplanning:     netlist out of logic synthesis based on gates of the before step (shapes, types and sizes).
+- Placement:         the logic cells are placed on the chip such that the initial timing is met.
+- Clock tree synthesis: for even spread of clock among all the logic cells
+- Routing stage:    
+- Static timing analysis: to see the setup time, hold time , maximum available frequency: this is the signoff step
+The one thing commona across all these steps are the LOGIC GATES
+This collection of gates is referred to as the library, these should be represented in a manner such that the EDA tool understands what the gates are.
+
+### Congestion aware placement using RePLAce
+
+Placement occurs in 2 stages: global and detailed
+- global placement is basically port placement and there is no legalization happening here
+- Legalization happens in detailed placements
+
+The standard cells are placed in rows, they have to be exactly inside the rows and no overlaps should be there, this is LEGALIZATION
+
+```
+run_placement
+```
+
+- Global placement happens first: The main objective in this step is to reduce wire length, in openLANE, there is a concept of HPWL (hald parameter wire length)
+- When the run_placement is run, the placement analysis can be seen as below:
+ ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/95218ed3-7862-436f-802a-20a346002790)
+
+Placement is where the standard cell positions are fixed, to visualize these changes, we go into 
+```
+Directory: results/placement/
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def &
+````
+All the standard cells that we initially saw in the lower left corner of the floorplan can now be seen as below:
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/3dc88bf0-de98-42cf-8dfe-f07f45aad0bc)
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/c586a10e-ca3e-4778-ac8e-080e3d7ec092)
+
+The second image is a zoomed in version of the standard cells.
+- The power-ground network creates the power distribution network
+- **But in OpenLANE, this does not happen during placement**
+- A post floorplan and post placement CTS, we do power ground generation just before the routing.
+
+
+## Cell design and characterization flows
+In a typical IC design flow, the buffers, logic gates, etc. are called standard cells
+- Standard cell is being placed in a place called the library
+- One of the sections of the library is to keep the standard cells
+- Library has got different gates for different functionality
+- It also has cells with different sizes, i.e different sized logic gates for example.
+- These sizes are referred to as drive strengths
+- Using these different sized cells will directly have a change in the characteristics
+
+If we take a particular inverter, the inv should be represented in terms of its shape, timing behaviour, power, etc. A cell as small of an inverter has to go to the steps of the cell design flow:
+- Inputs: Process design kits (PDKs), they include DRC & LVS rules, SPICE models, library and user-defined specs
+- - basically a tech file with some rules
+- - say rules for poly width, minimum extension rules, etc.
+- - There are thousands of rules that are present and need to be followed.
+- - For the SPICE models, the threshold voltage equations are seen, they have some parameters called foundry parameters, also called SPICE model parameters
+
+### Circuit design step
+ - The separation between the power rail and the ground rail is what will decide the cell height
+ - The top level designer deicded on the supply voltage
+ - The noise margin levels should also be taken care of
+ - If there is a specification that cerain libraries must be built on a particular layer, these are user-defined specifications
+ - library designer should decide all the pin functions and locations
+
+Based on these inputs, a library cell is to be developed by the libary developer
+
+The design steps are three:
+- Circuit design: 
+- - implement the function
+- - model the pmos and nmos to meet the library specifications
+- Layout design
+- Characterization
