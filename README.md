@@ -396,3 +396,54 @@ run floorplan
 
 ### Review floorplan files and steps to view floorplan
 
+The **config.tcl** file will have all the default settings.
+Highest priority is for the sky130A_sky130_fd_sc_hd_config.tcl
+To look at the floor plan
+```
+cd results/floorplan ( this is from inside runs)
+```
+def file is present there = Design exchange format
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/5cbd8c78-595c-4c79-ac05-cb427fed1581)
+- microns 1000: 1 micron = 1000 database units
+- The first lines contain the die specifications, first 0 is the lower left x value and the second 0 is the lower right x value
+- To see the actual layout, we use magic
+
+### Review floor plan layout in magic
+
+```
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.floorplan.def &
+```
+This command considers the merged lef file that we have seen previously and the tech file.
+
+- To align the layout to the centre, press **s** to select the entire layout and press **v** to align it to the centre.
+- To zoom into a particular portion of the layout, do a left mouse click and a right mouse click to form a box, press **z** to zoom in
+- We have set the input and output pin mode as 1, which makes them equidistant, it can be observed as shown below:
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/50caa3a0-8e39-42c7-8062-e8de88563409)
+- Move onto an object and press **s**, open the tkcon window and type **what**, it will show the layer
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/bf01a3dd-b9f7-4081-a5d9-67b59ad3f519)
+The below are the tapcells
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/97afe323-3d14-41e2-b86b-a7a4404f8511)
+
+Tapcells are meant to avoid the latchup conditions which occur in CMOS devices, they connect nwell to vdd and substrate to ground. These tapcells are diagonally equidistant, this value has also been set.
+The bottom left of the floorplan will have the standard cells
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/4f8d0d37-753d-4a6e-9c0e-aa516164291e)
+
+## Library binding and initial place design
+
+### Netlist binding and initial place design
+This is the Placement and routing stage of the physical design flow.
+Say, we have a particular netlist with some gates, the shape of these gates will represent the functionality of these gates
+- In reality, we dont have shapes, we have boxes, it has physical dimensions
+- A library will contain all the information of these boxes a.k.a cells, this can be subclassified into sublibraries
+- It will have delay information, conditions, width and height conditions, when conditions, shapes of the gates, etc.
+- A library has basically got flavours of each and every cell
+- Next, we have placement, to take those particular shapes and sizes and to place them on the floorplan
+- Till now, we have the following:
+- - Floorplan: it inclues all the IO pins 
+- - Netlist: all the gates
+- - Physical view of logic gates
+- The netlist is to be placed onto the floorplan, we take the physical view of logic gates and place them
+- The cells are placed near to its IO pins so that delays are avoided
+
+### Optimize placement using estimated wire length and capacitance
+
