@@ -525,7 +525,8 @@ If we take a particular inverter, the inv should be represented in terms of its 
 - - For the SPICE models, the threshold voltage equations are seen, they have some parameters called foundry parameters, also called SPICE model parameters
 
 ### Circuit design step
- - The separation between the power rail and the ground rail is what will decide the cell height
+ - The separation between the power rail and the ground rail will decide the cell height
+ - It is the responsibility of the library developer to maintain this cell height
  - The top level designer deicded on the supply voltage
  - The noise margin levels should also be taken care of
  - If there is a specification that cerain libraries must be built on a particular layer, these are user-defined specifications
@@ -536,6 +537,45 @@ Based on these inputs, a library cell is to be developed by the libary developer
 The design steps are three:
 - Circuit design: 
 - - implement the function
-- - model the pmos and nmos to meet the library specifications
-- Layout design
+- - model the pmos and nmos to meet the library specifications( for example, w/l ratios)
+- - Typical output is CDL: circuit description language
+- Layout design:
+- - Implement the function using MOS transistors
+- - to get the PMOS and NMOS network graphs from the implemented design
 - Characterization
+
+The circuit design step is mostly based on SPICE simulations.
+
+### Layout design
+
+The first step is to implement the function itself.
+- Next, PMOS and NMOS network graphs are to be derived
+- Generally, the path of layout is Euler's path and stick diagram
+
+Euler's path: Path that is being traced only once. Based on the Euler's path, a stick diagram is drawn
+- The next step is to convert this stick diagram into a proper layout, by also following the DRC rules and the top level user specifications.
+- The layout can be drawn using an open source tool called MAGIC 
+- The final step is to extract the parasitics from the layout and characterize it interms of timing
+- GDSII, LEF , extracted spice netlist(.cir) are the outputs
+- cir file: parasitics of each and every element
+- The next step is characterization to obtain the timing, noise and power information: output is **.libs** file
+
+### Typical characterization flow
+
+- Input stage
+- Design steps
+- output
+
+From the input stage, the output is a layout, description of the entire circuit, SPICE extracted netlist, subcircuit(has nmos and pmos models)
+- Read in the model: This comes out of the foundry
+- Read the extradcted SPICE netlist
+- to recognise the behaviour of the circuit
+- To read the subcircuit of the inverter
+- Attach the necessary power sources
+- Apply the stimulus
+- Provide the necessary output capacitances
+- Provide the necessary simulation commands (trans simulation?DC simulation..etc)
+
+Next step is to feed in all these inputs from the above steps in the form of a characterization software called as GUNA. The software will generate Timing, noise, power.libs files
+
+## General timing characterization parameters
