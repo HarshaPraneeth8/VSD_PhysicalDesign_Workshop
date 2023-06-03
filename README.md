@@ -579,3 +579,80 @@ From the input stage, the output is a layout, description of the entire circuit,
 Next step is to feed in all these inputs from the above steps in the form of a characterization software called as GUNA. The software will generate Timing, noise, power.libs files
 
 ## General timing characterization parameters
+The syntax is understood before, this is important to understand the GUNA software
+- Timing threshold definitions:
+- - Slew_low_rise_thr (threshold) : low means near the 0 level, defines the point towards the lower side of the power side, typically 20%
+- - slew_high_rise_thr
+- - slew_low_fall_thr
+- - slew_highfall_thr
+- - in_rise_thr: related to input waveforms 
+- - in_fall_thr
+- - out_rise_thr: related to output : point at which delay can be calculated on the output waveform
+- - out_fall_thr
+
+## Propagation delay and transition time
+
+- for delay, out-in needs to be calculated,
+```
+time(out_*_thr) - time(in_*_thr)
+```
+- If there is a movement of the threshold, then this creates problems, we see the output coming before the input, creating a negative delay, which is not possible.
+- This is due to choosing the wrong threshold points
+- If the waveform has high wire delays, then we can have timing problems even after choosing the correct threshold positions
+
+**Transition time**
+For a rise wavform, 
+```
+time(slew_high_rise_thr) - timme(slew_low_rise_thr)
+```
+
+For a falling waveform,
+```
+time(slew_high_fall_thr) - time(slew_low_fall_thr)
+```
+
+# Day-3
+
+## Design library cell using Magic layout and ngspice characterization
+
+### Labs for CMOS inverter ngspice simulations
+### IO Placer revision
+From a github link, we will be downloading a .magic file, from it, we will be doing post-layout simulation in ngpsice and post-characterizing  by plugging it into the openLANE flow
+
+There is an option to make changes on the fly in the openLANE flow
+after running synthesis and floorplan, say we want to change the config of how the IO pins are placed
+IO placer allows 4 strategies
+```
+set ::env(FP_IO_MODE) 2
+run_floorplan
+```
+as shown below, the IO positions are stacked
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/3a184421-e68e-4d4f-b75e-f1c40276bbc8)
+
+### SPCIE deck creation for CMOS Inverter
+SPICE deck is a connectivity information about the netlist, it has inputs, connectivity information, tap points
+- The connectivity of the substrate pin should also be defined
+- The load capacitor will depend on the input capacitors of the circuit
+- Next, we have to define the component values, in the example taken, thw (W/L) ratios are: 
+- - PMOS: 0.375/0.25 u
+- - NMOS: 0/375/0.25 u
+- The PMOS Should be generally wider than the NMOS, we will be doing this later
+- Ideally, twice or thrice larger than the NMOS
+- The output load calculated here is 10fF
+- Input gate voltage: 2.5v and drain voltage: 2.5v
+- The next step would be to identify the nodes, to say a component lies betweeen 2 places, we define nodes, the schematic of the inverter being considered is shown below:
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/41fa7a0c-61fb-485d-90c4-b439f843de06)
+The SPICE netlist can be written as
+For MOSFET: **Drain-gate-source-substrate**
+```
+M1 out in vdd vdd pmos W=0.375u L=0.25u
+M2 out in 0 0 nmos W=0.375u L=0.25u
+cload out 0 10f
+Vdd vdd 0 2,5
+Vin in 0 2.5
+*** Simulation commands ***
+.op
+.dc Vin 0 2.5 0.05
+```
+### SPICE Simulation lab for CMOS Inverter
+
