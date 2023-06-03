@@ -663,3 +663,26 @@ Vin in 0 2.5
 - All the tech parameters are located in the MODEL file
 - here, W/L of both NMOS and PMOS = 1.5
 
+### Lab setup steps
+- We need to clone the git repo at first
+```
+git clone https://github.com/nickson-jose/vsdstdcelldesign.git
+```
+we copy the tech file into the folder here
+```
+cd pdks/sky130A/libs.tech/magic/
+cp sky130A.tech pwd
+```
+Here clone into the pwd from the source
+In the pwd, the following command invokes magic
+```
+magic -T sky130A.tech sky130_inv.mag &
+```
+
+### 16-MASK CMOS Process
+The steps are:
+- Selecting a substrate: generally, P-type substrate
+- Creating active region for transistors: Mask1
+- - The field oxide is grown, this process is called LOCOS ( Local Oxidation of silicon): Bird's beak
+- N-well and P-well formation which will be used for PMOS and NMOS fabrication respectively
+- 
