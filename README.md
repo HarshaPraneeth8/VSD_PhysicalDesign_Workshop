@@ -619,9 +619,9 @@ time(slew_high_fall_thr) - time(slew_low_fall_thr)
 ### IO Placer revision
 From a github link, we will be downloading a .magic file, from it, we will be doing post-layout simulation in ngpsice and post-characterizing  by plugging it into the openLANE flow
 
-There is an option to make changes on the fly in the openLANE flow
-after running synthesis and floorplan, say we want to change the config of how the IO pins are placed
-IO placer allows 4 strategies
+- There is an option to make changes on the fly in the openLANE flow
+= after running synthesis and floorplan, say we want to change the config of how the IO pins are placed
+= IO placer allows 4 strategies
 ```
 set ::env(FP_IO_MODE) 2
 run_floorplan
@@ -643,8 +643,10 @@ SPICE deck is a connectivity information about the netlist, it has inputs, conne
 - The next step would be to identify the nodes, to say a component lies betweeen 2 places, we define nodes, the schematic of the inverter being considered is shown below:
 ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/41fa7a0c-61fb-485d-90c4-b439f843de06)
 The SPICE netlist can be written as
+
+### SPICE Simulation lab for CMOS Inverter
 For MOSFET: **Drain-gate-source-substrate**
-```
+```SPICE
 M1 out in vdd vdd pmos W=0.375u L=0.25u
 M2 out in 0 0 nmos W=0.375u L=0.25u
 cload out 0 10f
@@ -653,6 +655,11 @@ Vin in 0 2.5
 *** Simulation commands ***
 .op
 .dc Vin 0 2.5 0.05
+
+*** include tsmc_025um_model.mod ***
+.LIB "tsmc_025um_model.mod" CMOS_MODELS
+.end
 ```
-### SPICE Simulation lab for CMOS Inverter
+- All the tech parameters are located in the MODEL file
+- here, W/L of both NMOS and PMOS = 1.5
 
