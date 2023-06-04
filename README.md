@@ -685,4 +685,168 @@ The steps are:
 - Creating active region for transistors: Mask1
 - - The field oxide is grown, this process is called LOCOS ( Local Oxidation of silicon): Bird's beak
 - N-well and P-well formation which will be used for PMOS and NMOS fabrication respectively
+- Formation of gate
+- Lightly doped drain (LDD) formation
+- Source and drain formation
+- Formation of contacts and interconnects
+- Higher metal level formation
+
+### Lab introduction to Sky130 basic layers layout and LEF using inverter
+- the left pane has all the layer information
+- move the cursor across the poly-ndiff intersection and press s, this will select only to that area and type **what** on the tkcon window, this will tell the information
+- When s is pressed twice, the connected is also selected
+
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/24adda24-32d8-402b-9ddc-8465789f254b)
+
+- DRC in magic is an interactive DRC that can be accessed from the top bar
+- To extract SPICE, in the tkcon window
+- - Create an ext file
+- - convert to SPICE
+```
+extract all 
+ext2spice cthresh 0 rthresh 0
+ext2spice
+```
+- The below is the final SPICE netlist
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/7f7f2176-c643-4fde-81a2-6790cee4a985)
+
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/63c729c0-c68f-4d02-8958-4941c58efb34)
+```
+plot y vs time a
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/2f744f93-7355-4864-bb9d-572714ebef55)
+- Characterizing a cell is done by obtaining 4 parameters"
+- - Rise tranisition: Time taken for output waveform to transit from a value of 20 percent of max value to 80 percent of max value
+- - Fall transition: Time taken for output to fall from 80 percent to 20 percent
+- - Fall cell delay
+- - Rise cell delay
+
+**Rise tranisiion**
+- Max value: 3.3V, 20 percent is 0.66
+```
+at 0.6 : x0 = 2.17941e-09, y0 = 0.66
+at 2.66: x0 = 2.23861e-09, y0 = 2.64075
+Rise transition = x0 diff = 0.0592ns
+```
+- For fal tranistion, 80 percent to 20 percent
+```
+at 2.66: x0 = 2.12e-09, y0 = 2.63981
+at 0.6 : x0 = 2.18e-09, y0 = 0.66
+Fall tranisition: 0.06ns
+```
+- For propagation delay,
+```
+at 1.65:
+x0 = 2.20667e-09, y0 = 1.65047
+x0 = 2.14989e-09, y0 = 1.65047
+cell rise delay(propagation delay): 0.05678ns
+
+x0 = 4.07487e-09, y0 = 1.65008
+x0 = 4.0749e-09, y0 = 1.65016
+Cell fall delay: 0.0038ns
+```
+
+- Next objective is to use the layout and create a lef file, this will be used in openLANE and it is plugged into the picorv32 core
+
+# Day-4
+## Timing modelling using delay tables
+### Lab steps to convert grid info to track info
+
+- For place and route, the only information required is :
+- - Power and ground rail info
+- - PR boundary
+- - Input and output
+- LEF file has all this information
+- Next obj is to extract a lef file from this mag file, this lef file can be inserted into the picorv32 core
+- One of the gudelines to be followed, is that
+- - Input and output ports must lie on the intersection of the horizontal and vertical tracks
+- - width of the standard cell should be a odd multiple of track pitch and height should be an odd multiple of the track vertical pitch
+- Track info can be seen in this directory:
+```
+/home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/openlane/sky130_fd_sc_hd
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/cd303fe8-4c90-4b88-934d-1c846344e87f)
+- Tracks are used in the routing stage, routes can go over the tracks
+- routes are metal traces basically
+- We need to specify where we have specified route to go, this specification is given by this file
+- For the li1 layer, horizontal point is 0.23 with an X pitch of 0.46
+- Every metal layer has a direction
+- Ports are in li1 metal layer, we need to make sure that this is present in the intersection
+- From the tracks file, in the tkcon window,
+
+```
+grid 0.46um 0.34um 0.23um 0.17um
+```
+- This is basically converting the grid def to track definition, routing of li1 layer can only happen along this layer, now we need to check if io ports are at the intersection of the tracks, this ensures that the route can reach the port from the y as well as the x direction
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/f3ec0bf2-8610-4371-989e-f875aaeaa41d)
+
+### Mag file to lef cell
+
+- Width of std cell should be odd multiples of x-pitch, this can be checked using the grid drawn from the previous step
+- the height of the std cell is also to be of the same condition
+- the ports are defined as pins when the lef file is extracted
 - 
+- X-pitch is 0.46
+- Use the below commands to set the ports
+```
+port class input
+port class inout
+port use signal
+port use ground
+port use power
+```
+- Now we extract the lef file.
+```
+lef write
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/1f3ac7e3-ea69-4b39-8c1e-fc77e3b83064)
+
+- The pins are created as shown when we use the commands in magic to create ports, this is done because the PnR pin requires this information
+- Next step is to plug in this lef file to the picorv32 core
+- We need to move the files in the src folder
+- The first stage now would be synthesis, so we need to have the library that has the cell designs, the library is already present in the csdstdcelldesign
+- The following modifications should be done to the config.tcl file inside the picorv32a core
+```tcl
+# Design
+set ::env(DESIGN_NAME) "picorv32a"
+
+set ::env(VERILOG_FILES) "./designs/picorv32a/src/picorv32a.v"
+set ::env(SDC_FILE) "./designs/picorv32a/src/picorv32a.sdc"
+
+set ::env(CLOCK_PERIOD) "12.000"
+set ::env(CLOCK_PORT) "clk"
+
+
+set ::env(CLOCK_NET) $::env(CLOCK_PORT)
+
+set ::env(LIB_SYNTH) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__typical.lib"
+set ::env(LIB_FASTEST) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__fast.lib"
+set ::env(LIB_SLOWEST) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__slow.lib"
+set ::env(LIB_TYPICAL) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__typical.lib"
+
+set ::env(EXTRA_LEFS) [glob $::env(OPENLANE_ROOT)/designs/$::env(DESIGN_NAME)/src/*.lef]
+
+
+
+set filename $::env(OPENLANE_ROOT)/designs/$::env(DESIGN_NAME)/$::env(PDK)_$::env(STD_CELL_LIBRARY)_config.tcl
+if { [file exists $filename] == 1} {
+        source $filename
+
+```
+- After opening openlane, we normally do prep -design picorv32a, for the work to continue in the same directory,
+```
+prep -design picorv32a -tag 04-06_06-15 -overwrite
+```
+Next we paste the following after the above is run:
+```
+set lefs [glob $::env(DESIGN_DIR)/src/*.lef]
+add_lefs -src $lefs 
+```
+Now we run synthesis and check for the mapping, this happens from the change in config.tcl file
+```
+run_synthesis
+```
+
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/8979d3b8-14cf-476f-bafb-f6d8c513302b)
+
+- TNS is total negative slack
