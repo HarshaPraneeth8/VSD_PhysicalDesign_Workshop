@@ -850,3 +850,16 @@ run_synthesis
 ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/8979d3b8-14cf-476f-bafb-f6d8c513302b)
 
 - TNS is total negative slack
+- wns is worst negative slack
+- These parameters can be improved by changing the area and delay requirements/configs of the placement stage, so to do them, the following commands are used:
+
+```tcl
+set ::env(SYNTH_STRATEGY) "DELAY 0"
+set ::env(SYNTH_SIZING) 1
+
+set lefs [glob $::env(DESIGN_DIR)/src/*.lef]
+add_lefs -src $lefs
+
+run_synthesis
+
+```
