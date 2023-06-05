@@ -863,3 +863,22 @@ add_lefs -src $lefs
 run_synthesis
 
 ```
+For running floorplan, the below following commands are used:
+```
+init_floorplan
+place_io
+global_placement_or
+tap_decap_or
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/7b542b8e-5549-42f6-8849-cf96dbedcda5)
+
+Now, to run placement,
+```
+detailed_placement
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/52f57a51-50e6-4b3e-8de0-83e368ebf452)
+Now, we open the layout after placement, this is done by going into the results/placement directory and then using the below command to open magic
+```
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def 
+```
+
