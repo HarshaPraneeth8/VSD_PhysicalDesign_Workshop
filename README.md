@@ -881,4 +881,6 @@ Now, we open the layout after placement, this is done by going into the results/
 ```
 magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def 
 ```
+![Uploading image.png…]()
+
 
