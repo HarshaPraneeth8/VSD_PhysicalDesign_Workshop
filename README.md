@@ -911,3 +911,48 @@ x < (T-S-SU)
 ```
 ### Lab steps to configure OpenSTA for post-synth timing analysis
 - usually, if there are timing violations, seperate tools are used, in this case, that tool is OpenSTA
+
+- The buffers can be removed or changed and the openSTA can be used to change the values to meet slack, since slack is met here, we move forward
+
+```
+run_cts
+``` 
+- the above command is used to run clock tree synthesis
+- now, we run cts using
+```
+run_cts
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/7893191c-b006-4452-be8b-09a896e75ee0)
+
+Since all conditions are met, we move onto routing
+
+### Final steps for RTL2GDS using tritonRoute and openSTA
+### Lab steps to build power distribution command
+
+- For power and ground rails, we run the below command,
+```
+gen_pdn
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/47229e0b-6395-46b1-82f7-14d0c7ff865f)
+
+- Here, the standard cell rows are placed at 2.72, this is the height of the standard cells
+- for inv cell to get vdd and gnd, height of standard cell should be the same as 2.72 or in the multiples of 2.72
+- From the pads, power goes to the straps and from there it goes down to the standard cell rails
+- The green boxes can be assumed to be the picor
+- The red pad is the power pad and the blue pad is the gnd pad,
+- From the pads, the power is supplied to the ring
+- The vertical straps are present to get the power inside the chip
+- For the power to be supplied to the standard cells, rails are used
+- Straps are in metal4 and 5 as shown below
+
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/60f5b4a8-5590-42a2-bbd0-1ccccbed15dd)
+By running the 
+```
+echo $::env(CURRENT_DEF)
+```
+we can see that the def file has changed from cts def to pdn def
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/bcbdcff9-c5ad-4a4b-a1f6-446cde50fa66)
+
+### From power straps to standard cell power
+- TritonRoute is the engine used for routing, the configurations of routing can be seen under configuration/README.md
+- 
