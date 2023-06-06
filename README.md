@@ -189,6 +189,7 @@ When using openSource EDA tools, the task becomes a bit complicated
 - - Bridging: attaches a higher level intermediary
 ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/972e7431-37eb-452e-b9b2-9d9ad855f63b)
 - - The other solution is to create another antenna diode
+
 ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/7551d84d-e6f4-42f6-bac5-d45f1810a81a)
 
 With OpenLANE, a preventive approach has been taken
