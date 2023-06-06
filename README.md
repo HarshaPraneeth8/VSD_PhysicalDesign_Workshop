@@ -881,6 +881,33 @@ Now, we open the layout after placement, this is done by going into the results/
 ```
 magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def 
 ```
-![Uploading image.png…]()
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/69dc7b63-e938-4e73-8707-a321101301ed)
+- After expanding using :expand on tkcon window, we can visualize the alignment,
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/b9c71243-7f62-404a-8f79-3684d80d0619)
 
-
+### Setup timing analysis
+- say, we have a laucnch flop, capture flop and a combinational logic in between, and an ideal clock connected.
+- In basic Setup timing analysis, one edge of the clk is sent to the launch flop and the other edge to the capture flop
+- Assume the combinational logic has a delay of **x**
+- The combinational delay should be less than the time period 
+```
+x < T
+```
+- if time period is increased, then the frequency decreases which is a drawback
+- Now, we introduce practical conditions, take a particular flop, which has mux(s) inside it, this induces a delay 
+- The changes happen when the clock switches from logic 1 to logic 0
+- The Mux delay will affect the combinational delay requirement, the initial ideal conditions will now change
+- say, initially, if a complete time period T is available for the combinational logic, now it has less than that
+- this Mux delay induced is known as **setup time**
+- Now the equation chaneges to
+```
+x < (T - S)
+```
+- The clock is created using PLL, the clock circuitry is again based on some real circuitry, this clock source might have its own inbuilt variations
+- Even though the variation is minimal, it is still present, and is called jitter
+- after all the considerations, the combinational delay x becomes
+```
+x < (T-S-SU)
+```
+### Lab steps to configure OpenSTA for post-synth timing analysis
+- usually, if there are timing violations, seperate tools are used, in this case, that tool is OpenSTA
