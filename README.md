@@ -955,4 +955,21 @@ we can see that the def file has changed from cts def to pdn def
 
 ### From power straps to standard cell power
 - TritonRoute is the engine used for routing, the configurations of routing can be seen under configuration/README.md
-- 
+```
+run_routing
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/26ca85ef-3184-4831-b790-5c2a2ea83030)
+
+- 2 steps of routing happens, fast route and detailed route
+- a global/fast route first creates a routing guide
+- a detailed route uses an algorithm to find the best possible connectivity between these points
+- The number of violations, etc. can be seen below
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/17364634-8bb6-4e65-9a2c-533633009c59)
+
+Since the violations obtained are 0, there is no need to correct them
+Parasitic extraction is done separately using spef extractor, outside open lane
+ Invoke the engine using the command in SPEF_EXTRACTOR directory: 
+ ```python3 main.py /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/tmp/merged.lef /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/results/routing/picorv32a.def/
+ ```
+ 
+ **The detailed flow has been completed and the required files are obtained**
