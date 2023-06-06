@@ -970,7 +970,8 @@ run_routing
 Since the violations obtained are 0, there is no need to correct them
 Parasitic extraction is done separately using spef extractor, outside open lane
  Invoke the engine using the command in SPEF_EXTRACTOR directory: 
- ```python3 /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/tmp/merged.lef /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/results/routing/picorv32a.def/
+ ```
+ python 3 main.py/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/tmp/merged.lef /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/03-06_15-23/results/routing/picorv32a.def/
  ```
  
  **The detailed flow has been completed and the required files are obtained**
