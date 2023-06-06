@@ -973,5 +973,18 @@ Parasitic extraction is done separately using spef extractor, outside open lane
  ```
  python 3 main.py/home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/06-06_04-29/tmp/merged.lef /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/06-06_04-29/results/routing/picorv32a.def/
  ```
+ - To view the final layout in magic,under results, routing,
+ ```
+ magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.def
+```
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/cc926345-1629-4fd9-89ca-e6b6451a393e)
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/ffdc431f-ed82-41a0-897f-76e9d2894102)
+
+
+ - Next, the run_magic command is run to obtain the required gds file under
+ ```runs/[date]/results/magic/picorv32.gds```
+ ![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/75b38965-0177-4ad5-abee-2b1af669b265)
+![image](https://github.com/HarshaPraneeth8/VSD_PhysicalDesign_Workshop/assets/72025415/3071cc0a-b6a8-4316-a887-9dcaa8a421a8)
+
  
  **The detailed flow has been completed and the required files are obtained**
